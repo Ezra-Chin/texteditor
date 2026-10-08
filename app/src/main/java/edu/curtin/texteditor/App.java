@@ -1,5 +1,9 @@
 package edu.curtin.texteditor;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import javafx.application.Application;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -16,9 +20,19 @@ public class App extends Application
     public static final int FONT_SIZE = 20;
     private TextArea textArea = new TextArea();
     private LoadSaveUI loadSaveUI;
+    private ApiImpl api;
 
     public static void main(String[] args)
     {
+        Locale locale;
+        if (args.length > 0){
+            locale = new Locale(args[0]);
+        }else{
+            locale = Locale.getDefault();
+        }
+
+
+        Locale.setDefault(locale);
         Application.launch(args);
     }
 
@@ -28,15 +42,20 @@ public class App extends Application
     @Override
     public void start(Stage stage)
     {
-        loadSaveUI = new LoadSaveUI(stage, textArea, new FileIO());
-        stage.setTitle("Not So Silly Window No More");
+        Locale locale = Locale.getDefault();
+        ResourceBundle bundle = ResourceBundle.getBundle("bundle" , locale );
+        api = new ApiImpl(locale);
+
+
+        loadSaveUI = new LoadSaveUI(stage, textArea, new FileIO(), bundle);
+        stage.setTitle(bundle.getString("title"));
         stage.setMinWidth(800);
         stage.setMinHeight(600);
 
         // Create toolbar
-        Button openButton = new Button("Open");
-        Button saveButton = new Button("Save");
-        Button pluginButton = new Button("Plugins");
+        Button openButton = new Button(bundle.getString("open_button") );
+        Button saveButton = new Button(bundle.getString("save_button"));
+        Button pluginButton = new Button(bundle.getString("plugins_button"));
         ToolBar toolBar = new ToolBar(openButton, saveButton, pluginButton);
 
         // Subtle user experience tweaks
@@ -64,36 +83,6 @@ public class App extends Application
                                "; text is\n---\n" + newValue + "\n---\n");
         });
 
-        textArea.setText("This is some\ndemonstration text\nTry pressing F1, ctrl+b, ctrl+shift+b or alt+b.");
-        textArea.selectRange(8, 16); // Select a range of text (and move the caret to the end)
-
-        // Example global keypress handler.
-        scene.setOnKeyPressed(keyEvent ->
-        {
-            // See the documentation for the KeyCode class to see all the available keys.
-
-            KeyCode key = keyEvent.getCode();
-            boolean ctrl = keyEvent.isControlDown();
-            boolean shift = keyEvent.isShiftDown();
-            boolean alt = keyEvent.isAltDown();
-
-            if(key == KeyCode.F1)
-            {
-                new Alert(Alert.AlertType.INFORMATION, "You pressed F1.", ButtonType.OK).showAndWait();
-            }
-            else if(ctrl && shift && key == KeyCode.B)
-            {
-                new Alert(Alert.AlertType.INFORMATION, "Your pressed ctrl+shift+B.", ButtonType.OK).showAndWait();
-            }
-            else if(ctrl && key == KeyCode.B)
-            {
-                new Alert(Alert.AlertType.INFORMATION, "You pressed ctrl+B.", ButtonType.OK).showAndWait();
-            }
-            else if(alt && key == KeyCode.B)
-            {
-                new Alert(Alert.AlertType.INFORMATION, "You pressed alt+b.", ButtonType.OK).showAndWait();
-            }
-        });
 
         stage.setScene(scene);
         stage.sizeToScene();

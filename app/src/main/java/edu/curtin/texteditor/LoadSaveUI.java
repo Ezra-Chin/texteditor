@@ -12,6 +12,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
+import java.util.ResourceBundle;
 
 public class LoadSaveUI {
     private static final int SPACING = 8;
@@ -21,12 +22,14 @@ public class LoadSaveUI {
     private FileIO fileIO;    
     private FileChooser fileDialog = new FileChooser();
     private Dialog<String> encodingDialog;
+    private ResourceBundle bundle;
 
 
-    public LoadSaveUI(Stage stage, TextArea textArea,FileIO fileIO){
+    public LoadSaveUI(Stage stage, TextArea textArea,FileIO fileIO , ResourceBundle bundle){
         this.stage = stage;
         this.textArea = textArea;
         this.fileIO = fileIO;
+        this.bundle = bundle;
     }
 
     private String getEncoding(){
@@ -34,14 +37,14 @@ public class LoadSaveUI {
             var encodingComboBox = new ComboBox<String>();
             var content = new FlowPane();
             encodingDialog = new Dialog<>();
-            encodingDialog.setTitle("Select File Encoding");
+            encodingDialog.setTitle(bundle.getString("encoding_dialog_title"));
             encodingDialog.getDialogPane().setContent(content);
             encodingDialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
               encodingDialog.setResultConverter(
                 btn -> (btn == ButtonType.OK) ? encodingComboBox.getValue() : null);
             
             content.setHgap(SPACING);
-            content.getChildren().setAll(new Label("Encoding"), encodingComboBox);
+            content.getChildren().setAll(new Label(bundle.getString("encoding_label")), encodingComboBox);
             
             encodingComboBox.getItems().setAll("UTF-8", "UTF-16", "UTF-32");
             encodingComboBox.setValue("UTF-8");
@@ -51,7 +54,7 @@ public class LoadSaveUI {
 
 
     public void save(){
-        fileDialog.setTitle("Save File");
+        fileDialog.setTitle(bundle.getString("save_dialog_title"));
         File f = fileDialog.showSaveDialog(stage);
         if (f != null){
             String encoding = getEncoding();
@@ -61,7 +64,7 @@ public class LoadSaveUI {
                 }catch(Exception e){
                     new Alert(
                         Alert.AlertType.ERROR, 
-                        String.format("Error saving timetable: %s - %s", e.getClass().getName(), e.getMessage()),
+                        String.format(bundle.getString("save_error"), e.getClass().getName(), e.getMessage()),
                         ButtonType.CLOSE
                     ).showAndWait();
                 }
@@ -69,7 +72,22 @@ public class LoadSaveUI {
         }
     }
     public void open(){
-
+        fileDialog.setTitle(bundle.getString("open_dialog_title"));
+        File f = fileDialog.showOpenDialog(stage);
+        if (f != null){
+            String encoding = getEncoding();
+            if (encoding != null){
+                try{
+                    textArea.setText(fileIO.load(f, encoding));
+                }catch(Exception e){
+                    new Alert(
+                        Alert.AlertType.ERROR, 
+                        String.format(bundle.getString("open_error"), e.getClass().getName(), e.getMessage()),
+                        ButtonType.CLOSE
+                    ).showAndWait();
+                }
+            }
+        }
     }
 
 }

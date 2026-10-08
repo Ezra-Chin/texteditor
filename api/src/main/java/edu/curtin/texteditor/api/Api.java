@@ -1,5 +1,6 @@
 package edu.curtin.texteditor.api;
+import java.util.Locale;
 
-public class Api {
-    
+public interface Api{
+    Locale getLocale();
 }
