@@ -1,11 +1,12 @@
 package edu.curtin.texteditor.api;
 import java.util.Locale;
 
-public interface EditorApi {
+public interface PluginService {
     void addButton(String name, ButtonHandler handler);
-    void addTextChangeLIstener(TextChangeListener listener);
+    void addTextChangeListener(TextChangeListener listener);
     void addFunctionKeyListener(FunctionKeyListener listener);
 
+    String getUserInput(String input);
     String getText();
     void setText(String text);
 

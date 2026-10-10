@@ -20,7 +20,7 @@ public class App extends Application
     public static final int FONT_SIZE = 20;
     private TextArea textArea = new TextArea();
     private LoadSaveUI loadSaveUI;
-    private ApiImpl api;
+    private PluginServiceImpl api;
 
     public static void main(String[] args)
     {
@@ -44,7 +44,6 @@ public class App extends Application
     {
         Locale locale = Locale.getDefault();
         ResourceBundle bundle = ResourceBundle.getBundle("bundle" , locale );
-        api = new ApiImpl(locale);
 
 
         loadSaveUI = new LoadSaveUI(stage, textArea, new FileIO(), bundle);
@@ -76,6 +75,9 @@ public class App extends Application
         saveButton.setOnAction(event -> loadSaveUI.save());
         pluginButton.setOnAction(event -> toolBar.getItems().add(new Button("ButtonN")));
 
+
+        api = new PluginServiceImpl(locale, bundle, textArea, toolBar, scene);
+
         // TextArea event handlers & caret positioning.
         textArea.textProperty().addListener((object, oldValue, newValue) ->
         {
@@ -87,6 +89,12 @@ public class App extends Application
         stage.setScene(scene);
         stage.sizeToScene();
         stage.show();
+       
+
+
+
+
+
     }
 
 }

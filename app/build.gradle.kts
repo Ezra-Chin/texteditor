@@ -8,6 +8,9 @@ plugins{
 dependencies {
 	implementation(project(":api"))
 	antlr("org.antlr:antlr4:4.13.2")
+
+	runtimeOnly(project(":dateplugin"))
+	runtimeOnlyl(project(":findplugin"))
 }
 
 javafx{
@@ -17,5 +20,6 @@ javafx{
 
 application{
 	mainClass = "edu.curtin.texteditor.App"
+	implementation("org.apache.groovy:groovy:5.0.6")
 }
 
