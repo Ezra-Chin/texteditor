@@ -17,6 +17,7 @@ import java.util.jar.JarFile;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ButtonType;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
@@ -24,16 +25,14 @@ import javafx.scene.layout.HBox;
 public class PluginDialog {
     private PluginLoader pluginLoader;
     private Stage stage;
-    private PluginService api;
     private ResourceBundle bundle;
     private Dialog<Void> dialog;
     private FileChooser fileChooser = new FileChooser();
     private ListView<String> loadedList = new ListView<>();
 
-    public PluginDialog(PluginLoader pluginLoader, Stage stage, ResourceBundle bundle, PluginService api) {
+    public PluginDialog(PluginLoader pluginLoader, Stage stage, ResourceBundle bundle) {
         this.pluginLoader = pluginLoader;
         this.stage = stage;
-        this.api = api;
         this.bundle = bundle;
     }
 
@@ -41,16 +40,20 @@ public class PluginDialog {
         loadedList.getItems().setAll(pluginLoader.getLoadedNames());
     }
 
-    public void show(){
-        //https://docs.oracle.com/en/java/java-components/javafx/21/docs/javafx.controls/javafx/scene/control/Dialog.html6
-        if (dialog == null){
+    public void show() {
+        System.out.println("Pressed");
+        // https://docs.oracle.com/en/java/java-components/javafx/21/docs/javafx.controls/javafx/scene/control/Dialog.html6
+        if (dialog == null) {
             Button jarButton = new Button(bundle.getString("button_load_jar"));
             Button scriptButton = new Button(bundle.getString("button_load_script"));
+            Button classButton = new Button(bundle.getString("button_load_class"));
+            classButton.setOnAction(event -> loadClass());
             jarButton.setOnAction(event -> loadJar());
             scriptButton.setOnAction(event -> loadScript());
 
-//https://docs.oracle.com/en/java/java-components/javafx/27/docs/javafx.graphics/javafx/scene/layout/VBox.html
-            VBox content = new VBox(8 , new Label(bundle.getString("label_loaded")), loadedList, new HBox(8 , jarButton, scriptButton));
+            // https://docs.oracle.com/en/java/java-components/javafx/27/docs/javafx.graphics/javafx/scene/layout/VBox.html
+            VBox content = new VBox(8, new Label(bundle.getString("label_loaded")), loadedList,
+                    new HBox(8, jarButton, scriptButton));
 
             dialog = new Dialog<>();
             dialog.initOwner(stage);
@@ -71,14 +74,31 @@ public class PluginDialog {
         File file = fileChooser.showOpenDialog(stage);
 
         if (file != null) {
-            if (pluginLoader.loadScript(file)){
-                loadedList.getItems().add(file.getName());
-            }else{
-                 Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to load JAR ", ButtonType.CLOSE);
-                    alert.initOwner(stage);
-                    alert.showAndWait(); 
+            try {
+
+                pluginLoader.loadScript(file);
+                refreshList();
+            } catch (ClassCastException e) {
+
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to load JAR ", ButtonType.CLOSE);
+                alert.initOwner(stage);
+                alert.showAndWait();
+
             }
+
         }
+    }
+
+    private void loadClass() {
+        TextInputDialog input = new TextInputDialog();
+        input.initOwner(stage);
+        input.setTitle(bundle.getString("dialog_class_title"));
+        input.setHeaderText(null);
+        input.setContentText(bundle.getString("label_class_name"));
+        input.showAndWait().ifPresent(name -> {
+                pluginLoader.loadByClassName(name.trim());
+                refreshList();
+        });
     }
 
     public void loadJar() {
@@ -87,13 +107,15 @@ public class PluginDialog {
                 .setAll(new FileChooser.ExtensionFilter(bundle.getString("filter_jar"), "*.jar"));
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
-                if (pluginLoader.loadJar(file)) {
-                    refreshList();
-                } else {
-                    Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to load JAR ", ButtonType.CLOSE);
-                    alert.initOwner(stage);
-                    alert.showAndWait();
-                }
+            try{
+                pluginLoader.loadJar(file);
+                refreshList();
+            }catch( ClassCastException e){
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to load JAR ", ButtonType.CLOSE);
+                alert.initOwner(stage);
+                alert.showAndWait();
+
+            }
         }
     }
 

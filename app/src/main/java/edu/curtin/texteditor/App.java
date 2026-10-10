@@ -1,6 +1,5 @@
 package edu.curtin.texteditor;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -8,7 +7,6 @@ import javafx.application.Application;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 
 
@@ -20,7 +18,6 @@ public class App extends Application
     public static final int FONT_SIZE = 20;
     private TextArea textArea = new TextArea();
     private LoadSaveUI loadSaveUI;
-    private PluginServiceImpl api;
 
     public static void main(String[] args)
     {
@@ -73,17 +70,14 @@ public class App extends Application
         // Button event handlers.
         openButton.setOnAction(event -> loadSaveUI.open());
         saveButton.setOnAction(event -> loadSaveUI.save());
-        pluginButton.setOnAction(event -> toolBar.getItems().add(new Button("ButtonN")));
+
+        PluginServiceImpl api = new PluginServiceImpl(locale, bundle, textArea, toolBar, scene);
+        PluginLoader pluginLoader = new PluginLoader(api);
+        PluginDialog pluginDialog = new PluginDialog(pluginLoader , stage, bundle);
+
+        pluginButton.setOnAction(event -> pluginDialog.show());
 
 
-        api = new PluginServiceImpl(locale, bundle, textArea, toolBar, scene);
-
-        // TextArea event handlers & caret positioning.
-        textArea.textProperty().addListener((object, oldValue, newValue) ->
-        {
-            System.out.println("caret position is " + textArea.getCaretPosition() +
-                               "; text is\n---\n" + newValue + "\n---\n");
-        });
 
 
         stage.setScene(scene);
