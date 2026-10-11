@@ -18,7 +18,7 @@ import java.util.jar.Manifest;
 
 public class PluginLoader {
     private PluginService api;
-    private List<String> loadedNames = new ArrayList<>();
+    private final List<String> loadedNames = new ArrayList<>();
 
     public PluginLoader(PluginService api) {
         this.api = api;
@@ -31,57 +31,68 @@ public class PluginLoader {
     public void loadByClassName(String className) {
         try {
             startPlugin(Class.forName(className));
-        } catch (ReflectiveOperationException | ClassCastException e ) {
-
+        } catch (ReflectiveOperationException | ClassCastException e) {
+            System.err.println("Failed to load plugin: " + e.getMessage());
         }
     }
 
     public void loadJar(File jarFile) {
-        try {
-            String className = readMainClass(jarFile);
-            ClassLoader classLoader = new URLClassLoader(
-                new URL[] { jarFile.toURI().toURL() },
-                PluginLoader.class.getClassLoader());
-            startPlugin(Class.forName(className, true, classLoader));
-        } catch (ReflectiveOperationException | IOException e) {
+        String className = readMainClass(jarFile);
 
+        if (className == null) {
+            System.err.println("Plugin JAR has no main class");
+            return;
+        }
+
+        try (URLClassLoader classLoader = new URLClassLoader(
+                new URL[] { jarFile.toURI().toURL() },
+                PluginLoader.class.getClassLoader())) {
+
+            startPlugin(Class.forName(className, true, classLoader));
+
+        } catch (ReflectiveOperationException | IOException e) {
+            System.err.println("Failed to load plugin JAR: " + e.getMessage());
         }
     }
-    public void loadScript(File scriptFile){
-        try{
+
+    public void loadScript(File scriptFile) {
+        try {
             String code = Files.readString(scriptFile.toPath());
             GroovyShell shell = new GroovyShell();
             shell.setVariable("app", api);
             shell.evaluate(code);
             loadedNames.add(scriptFile.getName());
-        }catch(IOException e ){
+        } catch (IOException e) {
+            System.err.println("Failed to load plugin JAR: " + e.getMessage());
 
         }
     }
+
     private String readMainClass(File jarFile) {
-        try(JarFile jar = new JarFile(jarFile))
-        {
+        try (JarFile jar = new JarFile(jarFile)) {
             Manifest manifest = jar.getManifest();
             String className = (manifest == null) ? null
-                : manifest.getMainAttributes().getValue("TextEditor-Plugin-Main-Class");
-            if(className == null)
-            {
+                    : manifest.getMainAttributes().getValue("TextEditor-Plugin-Main-Class");
+            if (className == null) {
                 return null;
             }
 
             return className;
-        }catch(IOException e ){
+        } catch (IOException e) {
             return null;
 
         }
     }
-    private void startPlugin(Class<?> cls ){
-        try{
+
+    private void startPlugin(Class<?> cls) {
+        try {
             Plugin plugin = (Plugin) cls.getConstructor().newInstance();
             plugin.start(api);
             loadedNames.add(cls.getName());
-        }catch(ReflectiveOperationException | ClassCastException e ){
+        } catch (ReflectiveOperationException | ClassCastException e) {
+            System.out.println("Cannot start plugin");
 
         }
     }
+
 }

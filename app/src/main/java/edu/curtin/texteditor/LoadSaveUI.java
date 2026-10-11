@@ -13,6 +13,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import java.util.ResourceBundle;
+import java.io.IOException;
 
 public class LoadSaveUI {
     private static final int SPACING = 8;
@@ -61,7 +62,7 @@ public class LoadSaveUI {
             if (encoding != null){
                 try{
                     fileIO.save(f, textArea.getText(),encoding);
-                }catch(Exception e){
+                }catch(IOException e){
                     new Alert(
                         Alert.AlertType.ERROR, 
                         String.format(bundle.getString("save_error"), e.getClass().getName(), e.getMessage()),
@@ -79,7 +80,7 @@ public class LoadSaveUI {
             if (encoding != null){
                 try{
                     textArea.setText(fileIO.load(f, encoding));
-                }catch(Exception e){
+                }catch(IOException e){
                     new Alert(
                         Alert.AlertType.ERROR, 
                         String.format(bundle.getString("open_error"), e.getClass().getName(), e.getMessage()),

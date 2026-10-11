@@ -17,6 +17,9 @@ javafx{
 	version = "21"
 	modules("javafx.controls")
 }
+tasks.generateGrammarSource {
+	packageName = "edu.curtin.texteditor.keymap"
+}
 
 application{
 	mainClass = "edu.curtin.texteditor.App"

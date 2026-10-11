@@ -29,7 +29,7 @@ public class PluginServiceImpl implements PluginService{
     private final List<TextChangeListener> textListeners = new ArrayList<>();
     private final List<FunctionKeyListener> fKeyListeners = new ArrayList<>();
 
-    private boolean apiEditing = false;
+    private boolean apiEditing ;
 
     public PluginServiceImpl(Locale locale, ResourceBundle bundle, TextArea textArea, ToolBar toolBar, Scene scene) {
         this.locale = locale;
@@ -118,14 +118,7 @@ public class PluginServiceImpl implements PluginService{
 
     @Override
     public void setText(String text) {
-        apiEditing = true;
-
-
-        try {
-            textArea.setText(text);
-        } finally {
-            apiEditing = false;
-        }
+        textArea.setText(text);
     }
 
     @Override

@@ -47,13 +47,13 @@ public class PluginDialog {
             Button jarButton = new Button(bundle.getString("button_load_jar"));
             Button scriptButton = new Button(bundle.getString("button_load_script"));
             Button classButton = new Button(bundle.getString("button_load_class"));
-            classButton.setOnAction(event -> loadClass());
             jarButton.setOnAction(event -> loadJar());
             scriptButton.setOnAction(event -> loadScript());
+            classButton.setOnAction(event -> loadClass());
 
             // https://docs.oracle.com/en/java/java-components/javafx/27/docs/javafx.graphics/javafx/scene/layout/VBox.html
             VBox content = new VBox(8, new Label(bundle.getString("label_loaded")), loadedList,
-                    new HBox(8, jarButton, scriptButton));
+                    new HBox(8, jarButton, scriptButton , classButton));
 
             dialog = new Dialog<>();
             dialog.initOwner(stage);

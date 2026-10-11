@@ -9,6 +9,13 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.io.IOException;                                      
+import java.nio.file.Path;                                       
+import java.util.List;   
+import edu.curtin.texteditor.keymap.KeymapParser;                 
+import org.antlr.v4.runtime.misc.ParseCancellationException;      
+
+
 
 /**
  * Example code for setting up a JavaFX GUI.
@@ -84,11 +91,25 @@ public class App extends Application
         stage.sizeToScene();
         stage.show();
        
+        loadKeymap(stage,bundle, scene);
 
 
 
 
 
+    }
+    private void loadKeymap(Stage stage, ResourceBundle bundle, Scene scene){
+        try{
+            List<KeymapParser.BindingContext> bindings = new KeymapLoader(bundle).load(Path.of("keymap.txt"));
+            new KeymapHandler(bindings , textArea ).registerKeyHandlers(scene);
+        }catch(IOException e ){
+            Alert alert = new Alert(Alert.AlertType.ERROR, String.format(bundle.getString("keymap_read_error")), ButtonType.CLOSE);
+            alert.initOwner(stage);
+            alert.setTitle(bundle.getString("keymap_error_title"));
+            alert.setHeaderText(null);
+            alert.showAndWait();
+
+        }
     }
 
 }
