@@ -1,18 +1,12 @@
 package edu.curtin.texteditor;
 
-import edu.curtin.texteditor.api.Plugin;
-import edu.curtin.texteditor.api.PluginService;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
 import java.util.ResourceBundle;
-import java.util.jar.JarFile;
 
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
@@ -41,7 +35,6 @@ public class PluginDialog {
     }
 
     public void show() {
-        System.out.println("Pressed");
         // https://docs.oracle.com/en/java/java-components/javafx/21/docs/javafx.controls/javafx/scene/control/Dialog.html6
         if (dialog == null) {
             Button jarButton = new Button(bundle.getString("button_load_jar"));
@@ -74,17 +67,20 @@ public class PluginDialog {
         File file = fileChooser.showOpenDialog(stage);
 
         if (file != null) {
-            try {
 
-                pluginLoader.loadScript(file);
-                refreshList();
-            } catch (ClassCastException e) {
 
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to load JAR ", ButtonType.CLOSE);
-                alert.initOwner(stage);
-                alert.showAndWait();
+                if(pluginLoader.loadScript(file)){
 
-            }
+                    refreshList();
+                }else{
+                    Alert alert = new Alert(Alert.AlertType.ERROR, String.format(bundle.getString("error_script_load")), ButtonType.CLOSE);
+                    alert.initOwner(stage);
+                    alert.showAndWait();
+
+                }
+
+
+
 
         }
     }

@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Collections;
 
 public class KeymapLoader {
     private ResourceBundle bundle;
@@ -23,10 +24,12 @@ public class KeymapLoader {
     
     public List<KeymapParser.BindingContext> load (Path path){
         try{
+
+
             KeymapLexer lexer = new KeymapLexer(CharStreams.fromPath(path));
             KeymapParser parser = new KeymapParser( new CommonTokenStream(lexer));
 
-            ErrorListener errorListener = new BaseErrorListener(){
+            BaseErrorListener errorListener = new BaseErrorListener(){
                 @Override 
                 public void syntaxError(Recognizer<?,?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e ){
                      throw new ParseCancellationException(String.format(
@@ -39,11 +42,12 @@ public class KeymapLoader {
             parser.addErrorListener(errorListener);
 
             return parser.keymap().binding();
-
-
         }catch(IOException e){
+            return Collections.emptyList();
 
         }
+        
+
     }
 
 }

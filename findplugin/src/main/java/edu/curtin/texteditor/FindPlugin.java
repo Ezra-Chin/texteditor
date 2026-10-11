@@ -2,9 +2,6 @@ package edu.curtin.texteditor;
 
 import edu.curtin.texteditor.api.Plugin;
 import edu.curtin.texteditor.api.PluginService;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 
 public class FindPlugin implements Plugin{
    @Override 

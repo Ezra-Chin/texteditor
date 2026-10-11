@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import org.antlr.v4.parse.ANTLRParser.id_return;
+
 public class PluginLoader {
     private PluginService api;
     private final List<String> loadedNames = new ArrayList<>();
@@ -36,34 +38,35 @@ public class PluginLoader {
         }
     }
 
-    public void loadJar(File jarFile) {
-        String className = readMainClass(jarFile);
+    //cannot clsoe cz plugin still need use its class
+    @SuppressWarnings("PMD.CloseResource")
+    public boolean loadJar(File jarFile) {
 
-        if (className == null) {
-            System.err.println("Plugin JAR has no main class");
-            return;
-        }
-
-        try (URLClassLoader classLoader = new URLClassLoader(
-                new URL[] { jarFile.toURI().toURL() },
-                PluginLoader.class.getClassLoader())) {
-
+        try{
+            String className = readMainClass(jarFile);
+            if(className == null){
+                return false;
+            }
+            URLClassLoader classLoader = new URLClassLoader(new URL[] {jarFile.toURI().toURL()}, PluginLoader.class.getClassLoader());
             startPlugin(Class.forName(className, true, classLoader));
-
-        } catch (ReflectiveOperationException | IOException e) {
-            System.err.println("Failed to load plugin JAR: " + e.getMessage());
+            return true;
+        }catch(IOException | ReflectiveOperationException | ClassCastException e ){
+            return false;
         }
+
     }
 
-    public void loadScript(File scriptFile) {
+    public boolean loadScript(File scriptFile) {
         try {
             String code = Files.readString(scriptFile.toPath());
             GroovyShell shell = new GroovyShell();
             shell.setVariable("app", api);
             shell.evaluate(code);
             loadedNames.add(scriptFile.getName());
+            return true;
         } catch (IOException e) {
             System.err.println("Failed to load plugin JAR: " + e.getMessage());
+            return false;
 
         }
     }

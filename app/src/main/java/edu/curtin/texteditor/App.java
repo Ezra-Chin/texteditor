@@ -102,7 +102,7 @@ public class App extends Application
         try{
             List<KeymapParser.BindingContext> bindings = new KeymapLoader(bundle).load(Path.of("keymap.txt"));
             new KeymapHandler(bindings , textArea ).registerKeyHandlers(scene);
-        }catch(IOException e ){
+        }catch( ParseCancellationException e ){
             Alert alert = new Alert(Alert.AlertType.ERROR, String.format(bundle.getString("keymap_read_error")), ButtonType.CLOSE);
             alert.initOwner(stage);
             alert.setTitle(bundle.getString("keymap_error_title"));

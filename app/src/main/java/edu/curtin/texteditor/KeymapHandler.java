@@ -9,13 +9,13 @@ import javafx.scene.input.KeyEvent;
 import java.util.List;
 import java.util.Locale;
 
-public record KeymapHandler() {
+public class KeymapHandler{
     private final List<KeymapParser.BindingContext> bindings;    
     private final TextArea textArea;
     private boolean swallowType = false;
 
     public KeymapHandler(List<KeymapParser.BindingContext> bindings, TextArea textArea){
-        this.bindings = List.of(bindings);
+        this.bindings = List.copyOf(bindings);
         this.textArea = textArea;
     }
 
@@ -52,7 +52,7 @@ public record KeymapHandler() {
         boolean ctrl = false;
         boolean shift = false;
 
-        for(KeymapParser.ModifierContext mod : binding.combo().modifier()){
+        for(KeymapParser.ModifierContext mod : binding.threekeys().modifier()){
             if(mod.ALT() != null){
                 alt = true ;
             }
@@ -65,7 +65,7 @@ public record KeymapHandler() {
         }
 
 
-        String letter = binding.combo().LETTER().getText().toUpperCase(Locale.ROOT);
+        String letter = binding.threekeys().LETTER().getText().toUpperCase(Locale.ROOT);
 
         return event.getCode() == KeyCode.valueOf(letter) && event.isAltDown() == alt && event.isControlDown() == ctrl && event.isShiftDown() == shift;
     }
@@ -74,7 +74,7 @@ public record KeymapHandler() {
         String quoted = binding.STRING().getText();
         String str = quoted.substring(1,quoted.length() -1 ) ;
         boolean insert = binding.action().INSERT() != null;
-        boolean atCaret = binding.position().CARET != null;
+        boolean atCaret = binding.position().CARET() != null;
 
         String text = textArea.getText();
         int caret = textArea.getCaretPosition();
@@ -82,18 +82,16 @@ public record KeymapHandler() {
         int position= atCaret ? caret : text.lastIndexOf('\n', caret - 1 ) + 1 ;
 
         int newCaret;
-        if(insert)
-        {
+        if(insert){
             textArea.insertText(position, str);
             newCaret = caret + str.length();
         }
-        else if(text.startsWith(str, position ))
-        {
+        else if(text.startsWith(str, position )){
             textArea.deleteText(position , position + str.length());
-            newCaret = Math.max(pos, caret - str.length());
+            newCaret = Math.max(position, caret - str.length());
         }
-        else
-        {
+        else{
+            return;
         }
         textArea.positionCaret(newCaret);
     }

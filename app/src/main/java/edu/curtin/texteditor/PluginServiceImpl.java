@@ -11,16 +11,17 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToolBar;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.application.Platform;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-public class PluginServiceImpl implements PluginService{
+public class PluginServiceImpl implements PluginService {
 
-    private KeyCode[] functionKeys = {KeyCode.F1, KeyCode.F2, KeyCode.F3, KeyCode.F4, KeyCode.F5, KeyCode.F6,
-            KeyCode.F7, KeyCode.F8, KeyCode.F9, KeyCode.F10, KeyCode.F11, KeyCode.F12};
+    private KeyCode[] functionKeys = { KeyCode.F1, KeyCode.F2, KeyCode.F3, KeyCode.F4, KeyCode.F5, KeyCode.F6,
+            KeyCode.F7, KeyCode.F8, KeyCode.F9, KeyCode.F10, KeyCode.F11, KeyCode.F12 };
 
     private final Locale locale;
     private final ResourceBundle bundle;
@@ -29,26 +30,20 @@ public class PluginServiceImpl implements PluginService{
     private final List<TextChangeListener> textListeners = new ArrayList<>();
     private final List<FunctionKeyListener> fKeyListeners = new ArrayList<>();
 
-    private boolean apiEditing ;
-
     public PluginServiceImpl(Locale locale, ResourceBundle bundle, TextArea textArea, ToolBar toolBar, Scene scene) {
         this.locale = locale;
         this.bundle = bundle;
         this.textArea = textArea;
         this.toolBar = toolBar;
 
-
-
-        textArea.textProperty().addListener((object, oldValue , newValue) -> {
-
-            if (!apiEditing) {
-                for (TextChangeListener l : List.copyOf(textListeners)) {
-                    l.textChanged(newValue);
-                }
+        textArea.textProperty().addListener((object, oldValue, newValue) -> Platform.runLater(() -> {
+            for (TextChangeListener l : List.copyOf(textListeners)) {
+                l.textChanged(textArea.getText());
             }
-        });
+        }));
 
-        //https://docs.oracle.com/en/java/java-components/javafx/27/docs/javafx.base/javafx/beans/property/adapter/JavaBeanStringProperty.html?utm_source=chatgpt.com#addListener(javafx.beans.value.ChangeListener)
+
+        // https://docs.oracle.com/en/java/java-components/javafx/27/docs/javafx.base/javafx/beans/property/adapter/JavaBeanStringProperty.html?utm_source=chatgpt.com#addListener(javafx.beans.value.ChangeListener)
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             int keyNumber = functionKeyToNumber(event.getCode());
             if (keyNumber > 0) {
@@ -61,10 +56,9 @@ public class PluginServiceImpl implements PluginService{
     }
 
     private int functionKeyToNumber(KeyCode key) {
-        
+
         int result = 0;
         for (int i = 0; i < functionKeys.length; i++) {
-
 
             if (functionKeys[i] == key) {
                 result = i + 1;
@@ -85,20 +79,17 @@ public class PluginServiceImpl implements PluginService{
         dialog.setTitle(bundle.getString("user_input_dialog_title"));
         dialog.setHeaderText(null);
         dialog.setContentText(input);
-        return dialog.showAndWait().orElse(null); 
+        return dialog.showAndWait().orElse(null);
     }
 
     @Override
     public void addButton(String label, ButtonHandler handler) {
-
 
         Button button = new Button(label);
         button.setFocusTraversable(false);
         button.setOnAction(event -> handler.pressButton());
         toolBar.getItems().add(button);
     }
-
-
 
     @Override
     public void addTextChangeListener(TextChangeListener listener) {
@@ -143,7 +134,7 @@ public class PluginServiceImpl implements PluginService{
 
     @Override
     public void setSelection(int start, int end) {
-        textArea.selectRange(clamp(start), clamp(end)); 
+        textArea.selectRange(clamp(start), clamp(end));
     }
 
     @Override

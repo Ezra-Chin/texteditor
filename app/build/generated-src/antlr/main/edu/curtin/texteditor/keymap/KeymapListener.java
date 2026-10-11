@@ -1,4 +1,4 @@
-// Generated from edu/curtin/texteditor/keymap/Keymap.g4 by ANTLR 4.13.2
+// Generated from Keymap.g4 by ANTLR 4.13.2
 package edu.curtin.texteditor.keymap;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
