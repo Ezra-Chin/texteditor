@@ -69,4 +69,33 @@ public record KeymapHandler() {
 
         return event.getCode() == KeyCode.valueOf(letter) && event.isAltDown() == alt && event.isControlDown() == ctrl && event.isShiftDown() == shift;
     }
+
+    private void apply(KeymapParser.BindingContext binding){
+        String quoted = binding.STRING().getText();
+        String str = quoted.substring(1,quoted.length() -1 ) ;
+        boolean insert = binding.action().INSERT() != null;
+        boolean atCaret = binding.position().CARET != null;
+
+        String text = textArea.getText();
+        int caret = textArea.getCaretPosition();
+
+        int position= atCaret ? caret : text.lastIndexOf('\n', caret - 1 ) + 1 ;
+
+        int newCaret;
+        if(insert)
+        {
+            textArea.insertText(position, str);
+            newCaret = caret + str.length();
+        }
+        else if(text.startsWith(str, position ))
+        {
+            textArea.deleteText(position , position + str.length());
+            newCaret = Math.max(pos, caret - str.length());
+        }
+        else
+        {
+        }
+        textArea.positionCaret(newCaret);
+    }
+
 }
