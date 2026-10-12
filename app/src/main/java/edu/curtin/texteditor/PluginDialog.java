@@ -107,7 +107,7 @@ public class PluginDialog {
                 pluginLoader.loadJar(file);
                 refreshList();
             }catch( ClassCastException e){
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Unable to load JAR ", ButtonType.CLOSE);
+                Alert alert = new Alert(Alert.AlertType.ERROR, String.format(bundle.getString("error_plugin_load")), ButtonType.CLOSE);
                 alert.initOwner(stage);
                 alert.showAndWait();
 

@@ -33,8 +33,8 @@ public class PluginLoader {
     public void loadByClassName(String className) {
         try {
             startPlugin(Class.forName(className));
-        } catch (ReflectiveOperationException | ClassCastException e) {
-            System.err.println("Failed to load plugin: " + e.getMessage());
+        } catch (ReflectiveOperationException e) {
+            System.out.println("Failed to load plugin: " + e.getMessage());
         }
     }
 
@@ -65,7 +65,7 @@ public class PluginLoader {
             loadedNames.add(scriptFile.getName());
             return true;
         } catch (IOException e) {
-            System.err.println("Failed to load plugin JAR: " + e.getMessage());
+            System.out.println("Failed to load plugin JAR: " + e.getMessage());
             return false;
 
         }
