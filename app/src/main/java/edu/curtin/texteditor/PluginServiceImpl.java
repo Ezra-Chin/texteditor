@@ -43,7 +43,7 @@ public class PluginServiceImpl implements PluginService {
         }));
 
 
-        // https://docs.oracle.com/en/java/java-components/javafx/27/docs/javafx.base/javafx/beans/property/adapter/JavaBeanStringProperty.html?utm_source=chatgpt.com#addListener(javafx.beans.value.ChangeListener)
+        https://docs.oracle.com/en/java/java-components/javafx/27/docs/javafx.base/javafx/beans/property/adapter/JavaBeanStringProperty.html
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             int keyNumber = functionKeyToNumber(event.getCode());
             if (keyNumber > 0) {

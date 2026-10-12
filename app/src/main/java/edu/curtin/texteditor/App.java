@@ -9,7 +9,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.IOException;                                      
 import java.nio.file.Path;                                       
 import java.util.List;   
 import edu.curtin.texteditor.keymap.KeymapParser;                 
@@ -30,7 +29,7 @@ public class App extends Application
     {
         Locale locale;
         if (args.length > 0){
-            locale = new Locale(args[0]);
+            locale = Locale.forLanguageTag(args[0]);
         }else{
             locale = Locale.getDefault();
         }

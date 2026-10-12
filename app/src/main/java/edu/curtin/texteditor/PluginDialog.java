@@ -99,8 +99,7 @@ public class PluginDialog {
 
     public void loadJar() {
         fileChooser.setTitle(bundle.getString("dialog_jar_title"));
-        fileChooser.getExtensionFilters()
-                .setAll(new FileChooser.ExtensionFilter(bundle.getString("filter_jar"), "*.jar"));
+        fileChooser.getExtensionFilters().setAll(new FileChooser.ExtensionFilter(bundle.getString("filter_jar"), "*.jar"));
         File file = fileChooser.showOpenDialog(stage);
         if (file != null) {
             try{

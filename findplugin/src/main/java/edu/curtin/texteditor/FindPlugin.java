@@ -10,7 +10,8 @@ import java.util.ResourceBundle;
 public class FindPlugin implements Plugin{
    @Override 
    public void start(PluginService api){
-        api.addButton("Find", () -> find(api)); 
+        ResourceBundle bundle = ResourceBundle.getBundle("findplugin",api.getLocale(), DatePlugin.class.getClassLoader());
+        api.addButton(bundle.getString("findplugin"), () -> find(api)); 
         api.addFunctionKeyListener(key -> {
             if(key == 3){
                 find(api);
@@ -27,7 +28,7 @@ public class FindPlugin implements Plugin{
         
 
         String text = api.getText();
-        String target = term;
+        String target = Normalizer.normalize(term, Normalizer.Form.NKFC);
         int from = Math.min(api.getCaret(), text.length());
 
 

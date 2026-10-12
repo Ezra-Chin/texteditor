@@ -30,11 +30,12 @@ public class PluginLoader {
         return List.copyOf(loadedNames);
     }
 
-    public void loadByClassName(String className) {
+    public boolean loadByClassName(String className) {
         try {
             startPlugin(Class.forName(className));
+            return true;
         } catch (ReflectiveOperationException e) {
-            System.out.println("Failed to load plugin: " + e.getMessage());
+            return false;
         }
     }
 
@@ -87,15 +88,10 @@ public class PluginLoader {
         }
     }
 
-    private void startPlugin(Class<?> cls) {
-        try {
+    private void startPlugin(Class<?> cls) throws ReflectiveOperationException {
             Plugin plugin = (Plugin) cls.getConstructor().newInstance();
             plugin.start(api);
             loadedNames.add(cls.getName());
-        } catch (ReflectiveOperationException | ClassCastException e) {
-            System.out.println("Cannot start plugin");
-
-        }
     }
 
 }
